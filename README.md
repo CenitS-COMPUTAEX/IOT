@@ -8,7 +8,7 @@ The following papers have been published for this project:
 The following repositories are included in this project:
 
 - IOT (this repository): Contains scripts used to train and test one or more Machine Learning models, as well as scripts used to test and run them. Models can be run offline (with an existing dataset) or online (reading real-time data from a buffer).
-- IOT_pi: Contains scripts that run on the devices to launch attacks and read power usage.
+- [IOT_pi](https://github.com/CenitS-COMPUTAEX/IOT_pi): Contains scripts that run on the devices to launch attacks and read power usage.
 
 Physically, the code in these repositories is meant to work with a setup consisting on a main device that manages several end devices, launching attacks against them and reading their power usage.
 
