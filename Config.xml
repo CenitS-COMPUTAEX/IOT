@@ -1,0 +1,30 @@
+<!--
+### IOT configuration file ###
+This file contains all the parameters that can be changed to modify the way the models in this repository work.
+-->
+<Config>
+	<!-- Parameters used when transforming raw datasets -->
+	<Data>
+		<!-- After the transformed dataset is created by grouping the values of the original one, these two parameters are checked for each row
+		in the new dataset.
+		If at least PercentAttackThreshold % of the most recent PercentAttackCheck % of the samples in a row have an active attack,
+		the row will be marked as an attack. -->
+		<PercentAttackCheck>0.25</PercentAttackCheck>
+		<PercentAttackThreshold>0.5</PercentAttackThreshold>
+		<!-- After creating the transformed datasets, instances with an attack combination that has less than this number of total occurrences
+		will be dropped. This check happens before the train-test split. Only applies when training a model, not when running it with a separate
+		dataset. Minimum value: 2. -->
+		<MinimumInstanceCount>2</MinimumInstanceCount>
+	</Data>
+	<!-- Parameters used when running models -->
+	<Models>
+		<KNN>
+			<!-- Number of neighbors used to classify instances. Should be an odd number. A value of 1 means the model won't be able to
+			provide multi-prediction chances. -->
+			<NumNeighbors>3</NumNeighbors>
+		</KNN>
+	</Models>
+	<!-- When running a multi-prediction attack model, if the resulting total attack chance is higher than or equal to this value,
+	consider that an attack is currently taking place. Value must be a float between 0 and 1. -->
+	<MultiPredictionAttackThreshold>0.35</MultiPredictionAttackThreshold>
+</Config>
