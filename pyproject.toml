@@ -1,0 +1,39 @@
+[project]
+name = "IOT"
+version = "2.0.0"
+dependencies = [
+    "numpy==1.24",
+    "sktime==0.23",
+    "scikit-learn==1.2",
+    "matplotlib==3.7",
+    "pandas==1.5",
+    "seaborn==0.12",
+    "xgboost==1.7"
+]
+
+[project.optional-dependencies]
+alerts = [
+    "paramiko==3.2"
+]
+time-models = [
+    "aeon==0.4",
+    "tsfresh==0.20"
+]
+feature-selection = [
+    "aeon==0.4",
+    "tsfresh==0.20",
+    "dill==0.3",
+    "pymoo==0.6"
+]
+all = [
+    "paramiko==3.2",
+    "aeon==0.4",
+    "tsfresh==0.20",
+    "aeon==0.4",
+    "tsfresh==0.20",
+    "dill==0.3",
+    "pymoo==0.6"
+]
+
+[tool.setuptools.packages.find]
+include = ["IOT", "IOT.*"]

@@ -1,0 +1,155 @@
+<!--
+### IOT configuration file ###
+This file contains all the parameters that can be changed to modify the way the models in this repository work.
+-->
+<Config>
+	<!-- Parameters used when transforming raw datasets -->
+	<Data>
+		<!-- After the transformed dataset is created by grouping the values of the original one, these two parameters are checked for each row
+		in the new dataset.
+		If at least PercentAttackThreshold % of the most recent PercentAttackCheck % of the samples in a row have an active attack,
+		the row will be marked as an attack. -->
+		<PercentAttackCheck>0.25</PercentAttackCheck>
+		<PercentAttackThreshold>0.5</PercentAttackThreshold>
+		<!-- After creating the transformed datasets, instances with an attack combination that has less than this number of total occurrences
+		will be dropped. This check happens before the train-test split. Only applies when training a model, not when running it with a separate
+		dataset. Minimum value: 2. -->
+		<MinimumInstanceCount>2</MinimumInstanceCount>
+	</Data>
+	<!-- Parameters used when running models -->
+	<Models>
+		<KNN>
+			<!-- Number of neighbors used to classify instances. Should be an odd number. A value of 1 means the model won't be able to
+			provide multi-prediction chances. -->
+			<NumNeighbors>3</NumNeighbors>
+		</KNN>
+		<HIVE-COTE>
+			<!-- HIVE-COTE can take a long time to train completely. This value can be used to stop training early if it takes too long.
+			Lower values are expected to result in lower accuracy. The value represents minutes and must be an integer. Set to 0 to disable
+			the time limit. -->
+			<TimeLimit>5</TimeLimit>
+		</HIVE-COTE>
+	</Models>
+	<!-- When running a multi-prediction attack model, if the resulting total attack chance is higher than or equal to this value,
+	consider that an attack is currently taking place. Value must be a float between 0 and 1. -->
+	<MultiPredictionAttackThreshold>0.4</MultiPredictionAttackThreshold>
+	<!-- Parameters used when reporting an attack to an external server -->
+	<AlertServer>
+		<!-- Server IP -->
+		<IP>192.168.60.14</IP>
+		<!-- <IP>172.18.1.1</IP> -->
+		<!-- Server port -->
+		<Port>50001</Port>
+		<!-- Timeout (in seconds) when trying to connect -->
+		<Timeout>5</Timeout>
+		<!-- Server login username -->
+		<Username></Username>
+		<!-- Server login password. Not necessary if PKeyFile has been set. -->
+		<Password></Password>
+		<!-- Path to a file containing a public key to use for server authentication. Not necessasry if Password has been set. -->
+		<PKeyFile></PKeyFile>
+	</AlertServer>
+	<!-- Max amount of connection attempts to perform when trying to connect to a remote device (such as the alert server) -->
+	<ConnectionTries>5</ConnectionTries>
+	<!-- Lists which models to train and what hyperparameter combinations to use when training multiple models at once -->
+	<TrainMultipleModels>
+		<!-- Used when training regular models -->
+		<Regular>
+			<!-- List of models to train -->
+			<Models>
+				<Model>RANDOM_FOREST</Model>
+				<Model>EXTREME_BOOSTING_TREES</Model>
+				<Model>KNN</Model>
+				<Model>TSF</Model>
+				<Model>FEATURE_SUMMARY</Model>
+			</Models>
+			<!-- Hyperparameter combinations to use -->
+			<HyperparameterList>
+				<!--                               Total window time (assuming a measurement delay of 0.2s) -->
+				<Hyperparameters ga="5" ng="30"/>  <!-- 10s -->
+				<Hyperparameters ga="5" ng="60"/>  <!-- 20s -->
+				
+				<Hyperparameters ga="10" ng="20"/> <!-- 40s -->
+				<Hyperparameters ga="10" ng="30"/> <!-- 60s -->
+				<Hyperparameters ga="10" ng="40"/> <!-- 80s -->
+				<Hyperparameters ga="10" ng="50"/> <!-- 100s -->
+				
+				<Hyperparameters ga="20" ng="25"/> <!-- 100s -->
+			</HyperparameterList>
+		</Regular>
+		<!-- Used when training time models -->
+		<Time>
+			<!-- List of models to train -->
+			<Models>
+				<Model>MUSE</Model>
+				<Model>FreshPRINCE</Model>
+				<Model>FEATURE_SUMMARY</Model>
+				<Model>RDST</Model>
+				<Model>ROCKET</Model>
+				<Model>STSF</Model>
+				<Model>TSF</Model>
+			</Models>
+		</Time>
+	</TrainMultipleModels>
+	<!-- Options related to feature selection for time series classifiers through the use of a genetic algorithm -->
+	<FeatureSelection>
+		<!-- List of models used to calculate the average F1 score of a solution -->
+		<Models>
+			<!-- <Model>MUSE</Model> -->
+			<!-- <Model>FreshPRINCE</Model> -->
+			<Model>FEATURE_SUMMARY</Model>
+			<Model>RDST</Model>
+			<Model>ROCKET</Model>
+			<!-- <Model>STSF</Model> -->
+			<Model>TSF</Model>
+		</Models>
+		<!-- Percent of data that will be used to test the models -->
+		<TestPercent>20</TestPercent>
+		<!-- Parameters for the genetic algorithm used to look for solutions -->
+		<GeneticAlgorithm>
+			<!-- Number of individuals present on each iteration -->
+			<PopulationSize>16</PopulationSize>
+			<!-- Number of offspring individuals created on each iteration -->
+			<NumOffsprings>8</NumOffsprings>
+			<!-- Chance of a newly generated individual receiving a mutation (0-100) -->
+			<MutationChance>10</MutationChance>
+			<!-- When performing a mutation, chance of each individual feature bit being switched (from feature chosen to not chosen and viceversa)
+			(0-100) -->
+			<MutationStrength>25</MutationStrength>
+			<!-- Stop after this many iterations -->
+			<NumIterations>200</NumIterations>
+			<!-- Size of the cache used to store the fitness of already seen individuals. The value is specified as a power of 2. For example,
+			if the value is 16, the cache will have a size of 2^16 = 65536.
+			The maximum value is 64.
+			If the value is greater than the amount of features, it will be set to the amount of features (no point in having a larger cache, since
+			there's only 2^num_features possible individuals)
+			If the value is equal to the amount of features, the cache will have enough space to hold all possible individuals, so F1 scores
+			from repeated individuals will never have to be recalculated.
+			If the value is lower than the amount of features, the cache won't have enough space to hold all possible individuals, so F1 scores
+			from repeated individuals might have to be recalculated.
+			-->
+			<CacheSizeExponent>16</CacheSizeExponent>
+		</GeneticAlgorithm>
+		<!-- Print the current progress after each iteration -->
+		<PrintProgress>true</PrintProgress>
+		<!-- If true, the program will print messages listing which models are being run and the time taken to train and test each one of them
+		(note that the time shown is a simple end time - start time calculation, and therefore doesn't reflect the CPU time spent running
+		each model) -->
+		<Verbose>false</Verbose>
+		<!-- Number of subprocesses each individual will use to run models. -1 means unlimited (one process for each model). -->
+		<NumProcesses>1</NumProcesses>
+		<!-- Timeouts used by individuals to train their models, in seconds. If an individual hasn't finished training its models when the
+		timeout expires, its unfinished background tasks will be killed and relaunched.
+		Each attempt will use one of the timeouts listed here, in order. If the list is exhausted, any models that did not finish in time will
+		not be used to score the current individual.
+		Leave blank to disable. If disabled, models will be allowed to run without a time limit (warning: could cause hangs).
+		The first attempt on the first iteration of the algorithm will have its timeout doubled in order to compensate for the larger amount
+		of individuals it has to score. -->
+		<ModelTimeouts>
+			<Timeout>900</Timeout> <!-- 15 minutes -->
+			<!-- Any models that didn't finish after 15 minutes most likely got stuck, so we try restarting. -->
+			<Timeout>600</Timeout> <!-- 10 minutes -->
+			<!-- If a model couldn't finish after 2 attempts, we just forget about it. -->
+		</ModelTimeouts>
+	</FeatureSelection>
+</Config>
